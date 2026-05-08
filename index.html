@@ -14,9 +14,8 @@
   --mono:'Share Tech Mono',monospace;--sans:'Rajdhani',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background-image:url('https://CLX33.github.io/planification-tournoi/ss_ec3dd1c52751d8908ffb140a33dc448e39da26d0.1920x1080.jpg');background-size:cover;background-position:center;background-repeat:no-repeat;pointer-events:none;z-index:0;}
-body::after{content:'';position:fixed;inset:0;background:rgba(10,10,18,0.82);pointer-events:none;z-index:0;}
+body{background:#0d0d12 url('https://CLX33.github.io/planification-tournoi/ss_ec3dd1c52751d8908ffb140a33dc448e39da26d0.1920x1080.jpg') center/cover no-repeat fixed;color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:rgba(8,8,15,0.58);pointer-events:none;z-index:0;}
 
 /* SIDEBAR */
 .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--bg2);border-right:1px solid var(--border);z-index:100;display:flex;flex-direction:column;}
