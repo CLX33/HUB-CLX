@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planning Tournoi</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d12;
+  --bg2: #13131b;
+  --bg3: #1a1a25;
+  --border: #2a2a3a;
+  --accent: #c0392b;
+  --accent2: #e74c3c;
+  --gold: #f0a500;
+  --silver: #a0a8b8;
+  --green: #27ae60;
+  --purple: #8e44ad;
+  --orange: #e67e22;
+  --cyan: #0eb8c4;
+  --text: #e8e8f0;
+  --text2: #8888a8;
+  --mono: 'Share Tech Mono', monospace;
+  --sans: 'Rajdhani', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+/* BG grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+
+/* HEADER */
+header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  position: relative;
+}
+header::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--gold), var(--accent), transparent);
+  margin-top: 1rem;
+}
+.title-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--accent);
+  padding: 3px 12px;
+}
+h1 {
+  font-family: var(--mono);
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  letter-spacing: 2px;
+  color: var(--text);
+  text-transform: uppercase;
+}
+h1 span { color: var(--gold); }
+
+/* TOOLBAR */
+.toolbar {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 4px;
+  align-items: center;
+}
+.toolbar label { font-size: 13px; color: var(--text2); font-weight: 600; letter-spacing: 1px; }
+.toolbar input[type="time"] {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  font-family: var(--mono); font-size: 14px; padding: 5px 10px; border-radius: 3px;
+  outline: none; cursor: pointer;
+}
+.toolbar input[type="time"]:focus { border-color: var(--accent); }
+.toolbar input[type="number"] {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text);
+  font-family: var(--mono); font-size: 14px; padding: 5px 8px; border-radius: 3px;
+  width: 70px; outline: none;
+}
+.btn {
+  padding: 7px 16px; border: none; border-radius: 3px; font-family: var(--sans);
+  font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 1px;
+  transition: all 0.15s; text-transform: uppercase;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+.btn-gold { background: var(--gold); color: #000; }
+.btn-gold:hover { filter: brightness(1.1); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.sep { flex: 1; }
+
+/* DAY LABEL */
+.day-label {
+  display: flex; align-items: center; gap: 12px;
+  margin: 2rem 0 1rem;
+}
+.day-label::before, .day-label::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border));
+}
+.day-label::before { background: linear-gradient(90deg, var(--border), transparent); }
+.day-text {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 4px;
+  color: var(--text2); text-transform: uppercase; white-space: nowrap;
+  border: 1px solid var(--border); padding: 3px 14px;
+}
+
+/* BLOC */
+.bloc {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.bloc:hover { border-color: #3a3a55; }
+.bloc-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.bloc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.bloc-title-input {
+  background: transparent; border: none; outline: none;
+  font-family: var(--mono); font-size: 13px; font-weight: 700;
+  color: var(--text); letter-spacing: 1px; flex: 1;
+  text-transform: uppercase; cursor: text;
+}
+.bloc-title-input::placeholder { color: var(--text2); }
+.bloc-actions { display: flex; gap: 6px; }
+.chevron { color: var(--text2); font-size: 14px; transition: transform 0.2s; }
+.chevron.open { transform: rotate(180deg); }
+
+/* ENTRY */
+.entries { padding: 8px; }
+.entry {
+  display: grid;
+  grid-template-columns: 110px 1fr 90px 90px 32px;
+  gap: 6px; align-items: center;
+  padding: 6px 8px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+  position: relative;
+}
+.entry:hover { background: var(--bg3); border-color: var(--border); }
+.entry-time {
+  font-family: var(--mono); font-size: 13px; color: var(--gold);
+  white-space: nowrap; font-weight: 700;
+}
+.entry-label-input {
+  background: transparent; border: none; outline: none;
+  font-family: var(--sans); font-size: 14px; font-weight: 600;
+  color: var(--text); width: 100%;
+}
+.entry-label-input::placeholder { color: var(--text2); }
+.entry-label-input:focus { color: #fff; }
+.entry-dur-input {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); font-family: var(--mono); font-size: 12px;
+  padding: 3px 6px; border-radius: 2px; width: 100%; outline: none; text-align: center;
+}
+.entry-dur-input:focus { border-color: var(--accent); color: var(--text); }
+.entry-type {
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text2); font-family: var(--sans); font-size: 12px;
+  padding: 3px 6px; border-radius: 2px; width: 100%; outline: none;
+  cursor: pointer;
+}
+.entry-del {
+  background: none; border: none; color: var(--text2); cursor: pointer;
+  font-size: 16px; transition: color 0.15s; padding: 0 4px;
+}
+.entry-del:hover { color: var(--accent2); }
+.entry.type-pause { background: rgba(0,0,0,0.2); }
+.entry.type-pause .entry-label-input { color: var(--text2); font-style: italic; }
+.entry.type-pause .entry-time { color: var(--text2); }
+.entry.type-battement .entry-time { color: var(--silver); }
+.entry.type-battement .entry-label-input { color: var(--silver); }
+.entry.type-finale .entry-time { color: var(--gold); }
+.add-entry-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px; color: var(--text2); cursor: pointer;
+  font-size: 12px; font-family: var(--sans); font-weight: 600;
+  border: 1px dashed var(--border); border-radius: 3px;
+  margin: 4px 8px 8px; background: none; width: calc(100% - 16px);
+  letter-spacing: 1px; transition: all 0.15s; text-transform: uppercase;
+}
+.add-entry-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(192,57,43,0.05); }
+
+/* ADD BLOC */
+.add-bloc-area {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+/* EXPORT */
+.export-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1rem;
+  margin-top: 1.5rem;
+}
+.export-box h3 { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; color: var(--text2); margin-bottom: 10px; text-transform: uppercase; }
+.export-text {
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--text); font-family: var(--mono); font-size: 12px;
+  padding: 12px; border-radius: 3px; width: 100%;
+  min-height: 120px; line-height: 1.6; resize: vertical;
+  outline: none;
+}
+
+/* COLOR SWATCHES */
+.color-pick { display: flex; gap: 5px; }
+.swatch {
+  width: 20px; height: 20px; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; transition: border-color 0.15s;
+}
+.swatch:hover, .swatch.active { border-color: #fff; }
+
+/* DRAG HANDLE */
+.drag-handle {
+  cursor: grab; color: var(--text2); font-size: 14px; padding: 0 4px;
+  user-select: none;
+}
+.drag-handle:active { cursor: grabbing; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .entry { grid-template-columns: 90px 1fr 70px 32px; }
+  .entry-type { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title-badge">⚡ Tournament Manager</div>
+    <h1>Planning <span>Tournoi</span></h1>
+  </header>
+
+  <div class="toolbar">
+    <label>DÉBUT J1</label>
+    <input type="time" id="startDay1" value="15:15" oninput="recalcAll()">
+    <label style="margin-left:12px;">DÉBUT J2</label>
+    <input type="time" id="startDay2" value="20:00" oninput="recalcAll()">
+    <label style="margin-left:12px;">Durée match (min)</label>
+    <input type="number" id="defaultDur" value="10" min="1" max="120" oninput="recalcAll()">
+    <div class="sep"></div>
+    <button class="btn btn-secondary" onclick="exportText()">📋 Exporter</button>
+    <button class="btn btn-gold" onclick="copyExport()">Copier</button>
+  </div>
+
+  <div id="planner"></div>
+
+  <div class="add-bloc-area">
+    <button class="btn btn-secondary" onclick="addBloc('day1')">+ Bloc Jour 1</button>
+    <button class="btn btn-secondary" onclick="addBloc('day2')">+ Bloc Jour 2</button>
+  </div>
+
+  <div class="export-box" id="exportBox" style="display:none;">
+    <h3>🖨️ Export texte</h3>
+    <textarea class="export-text" id="exportText" readonly></textarea>
+  </div>
+</div>
+
+<script>
+const COLORS = {
+  green: '#27ae60', yellow: '#f0a500', red: '#c0392b',
+  purple: '#8e44ad', orange: '#e67e22', cyan: '#0eb8c4',
+  white: '#888899', black: '#444456'
+};
+const COLOR_KEYS = Object.keys(COLORS);
+
+const TYPES = ['match','pause','battement','finale','loser','placement'];
+
+let data = {
+  day1: [],
+  day2: []
+};
+
+// ---- DEFAULT DATA ----
+function initData() {
+  data = {
+    day1: [
+      { id: uid(), title: 'QUAL PHASE 3A', color: 'green', open: true, entries: [
+        { id: uid(), label: 'MATCH 1 (Seed 1)', dur: 10, type: 'match' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'MATCH 2 (Seed 2)', dur: 10, type: 'match' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+      ]},
+      { id: uid(), title: 'QUAL PHASE 3B', color: 'green', open: true, entries: [
+        { id: uid(), label: 'MATCH 3 (Seed 3)', dur: 10, type: 'match' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'MATCH 4 (Seed 4)', dur: 10, type: 'match' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+      ]},
+      { id: uid(), title: 'LOSER BRACKET', color: 'black', open: true, entries: [
+        { id: uid(), label: 'LOSER MATCH', dur: 10, type: 'loser' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+      ]},
+      { id: uid(), title: 'QUAL PHASE 2A & 2B', color: 'yellow', open: true, entries: [
+        { id: uid(), label: 'QUAL PHASE 2A (9th-12th)', dur: 10, type: 'placement' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'QUAL PHASE 2B (9th-12th)', dur: 10, type: 'placement' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+      ]},
+      { id: uid(), title: 'PLACEMENT 7th-8th', color: 'orange', open: true, entries: [
+        { id: uid(), label: 'MATCH 7th-8th A', dur: 10, type: 'match' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'MATCH 7th-8th B', dur: 10, type: 'match' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+      ]},
+    ],
+    day2: [
+      { id: uid(), title: 'QUART & DEMI-FINALE', color: 'red', open: true, entries: [
+        { id: uid(), label: 'QUART DE FINALE (5-6 place)', dur: 10, type: 'match' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+        { id: uid(), label: 'DEMI-FINALE (Top 4)', dur: 10, type: 'match' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+      ]},
+      { id: uid(), title: 'PETITE FINALE (BO5) — 3rd 45€ / 4th 0€', color: 'purple', open: true, entries: [
+        { id: uid(), label: 'Manche 1', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 2', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 3', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 4 (si besoin)', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 5 (si besoin)', dur: 10, type: 'finale' },
+        { id: uid(), label: '☕ PAUSE', dur: 8, type: 'pause' },
+      ]},
+      { id: uid(), title: 'GRANDE FINALE (BO5) — 1st 240€ / 2nd 105€', color: 'yellow', open: true, entries: [
+        { id: uid(), label: 'Manche 1', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 2', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 3', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 4 (si besoin)', dur: 10, type: 'finale' },
+        { id: uid(), label: 'Battement', dur: 5, type: 'battement' },
+        { id: uid(), label: 'Manche 5 (si besoin)', dur: 10, type: 'finale' },
+      ]},
+    ]
+  };
+}
+
+function uid() { return Math.random().toString(36).slice(2,9); }
+
+function timeToMin(str) {
+  const [h,m] = str.split(':').map(Number);
+  return h * 60 + m;
+}
+function minToTime(m) {
+  const h = Math.floor(m / 60) % 24;
+  const min = m % 60;
+  return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
+
+function recalcAll() {
+  renderAll();
+}
+
+function calcTimes(day) {
+  const startKey = day === 'day1' ? 'startDay1' : 'startDay2';
+  let cur = timeToMin(document.getElementById(startKey).value);
+  const blocs = data[day];
+  for (const bloc of blocs) {
+    for (const e of bloc.entries) {
+      e._start = cur;
+      e._end = cur + (parseInt(e.dur) || 0);
+      cur = e._end;
+    }
+  }
+}
+
+function renderAll() {
+  calcTimes('day1');
+  calcTimes('day2');
+  const el = document.getElementById('planner');
+  el.innerHTML = '';
+
+  // Day 1
+  el.appendChild(makeDayLabel('JOUR 1'));
+  for (const bloc of data.day1) el.appendChild(renderBloc(bloc, 'day1'));
+
+  // Day 2
+  el.appendChild(makeDayLabel('JOUR 2'));
+  for (const bloc of data.day2) el.appendChild(renderBloc(bloc, 'day2'));
+}
+
+function makeDayLabel(text) {
+  const d = document.createElement('div');
+  d.className = 'day-label';
+  d.innerHTML = `<span class="day-text">${text}</span>`;
+  return d;
+}
+
+function renderBloc(bloc, day) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'bloc';
+
+  // header
+  const hdr = document.createElement('div');
+  hdr.className = 'bloc-header';
+  hdr.innerHTML = `
+    <div class="bloc-dot" style="background:${COLORS[bloc.color] || '#888'}"></div>
+    <input class="bloc-title-input" value="${bloc.title}" placeholder="Nom du bloc" oninput="updateBlocTitle('${day}','${bloc.id}',this.value)">
+    <div class="color-pick">${COLOR_KEYS.map(c=>`<div class="swatch ${bloc.color===c?'active':''}" style="background:${COLORS[c]}" title="${c}" onclick="setBlocColor('${day}','${bloc.id}','${c}')"></div>`).join('')}</div>
+    <div class="bloc-actions">
+      <button class="btn btn-secondary btn-sm" onclick="moveBloc('${day}','${bloc.id}',-1)">↑</button>
+      <button class="btn btn-secondary btn-sm" onclick="moveBloc('${day}','${bloc.id}',1)">↓</button>
+      <button class="btn btn-secondary btn-sm" onclick="deleteBloc('${day}','${bloc.id}')" style="color:var(--accent)">✕</button>
+    </div>
+    <span class="chevron ${bloc.open?'open':''}">▼</span>
+  `;
+  hdr.querySelector('.chevron').addEventListener('click', () => {
+    bloc.open = !bloc.open;
+    renderAll();
+  });
+  wrapper.appendChild(hdr);
+
+  if (!bloc.open) return wrapper;
+
+  // entries
+  const entries = document.createElement('div');
+  entries.className = 'entries';
+
+  for (const e of bloc.entries) {
+    const row = document.createElement('div');
+    row.className = `entry type-${e.type}`;
+    row.innerHTML = `
+      <div class="entry-time">${minToTime(e._start)} - ${minToTime(e._end)}</div>
+      <input class="entry-label-input" value="${e.label}" placeholder="Description..." oninput="updateEntry('${day}','${bloc.id}','${e.id}','label',this.value)">
+      <input class="entry-dur-input" type="number" value="${e.dur}" min="0" max="300" title="Durée (min)" oninput="updateEntry('${day}','${bloc.id}','${e.id}','dur',this.value)">
+      <select class="entry-type" onchange="updateEntry('${day}','${bloc.id}','${e.id}','type',this.value)">
+        ${TYPES.map(t=>`<option value="${t}" ${e.type===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <button class="entry-del" onclick="deleteEntry('${day}','${bloc.id}','${e.id}')">✕</button>
+    `;
+    entries.appendChild(row);
+  }
+
+  // add entry
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-entry-btn';
+  addBtn.textContent = '+ Ajouter une entrée';
+  addBtn.onclick = () => addEntry(day, bloc.id);
+  entries.appendChild(addBtn);
+
+  wrapper.appendChild(entries);
+  return wrapper;
+}
+
+// ---- ACTIONS ----
+function updateBlocTitle(day, id, val) {
+  const b = data[day].find(b=>b.id===id);
+  if (b) b.title = val;
+}
+function setBlocColor(day, id, color) {
+  const b = data[day].find(b=>b.id===id);
+  if (b) { b.color = color; renderAll(); }
+}
+function moveBloc(day, id, dir) {
+  const arr = data[day];
+  const i = arr.findIndex(b=>b.id===id);
+  const ni = i + dir;
+  if (ni < 0 || ni >= arr.length) return;
+  [arr[i], arr[ni]] = [arr[ni], arr[i]];
+  renderAll();
+}
+function deleteBloc(day, id) {
+  data[day] = data[day].filter(b=>b.id!==id);
+  renderAll();
+}
+function addBloc(day) {
+  data[day].push({ id: uid(), title: 'NOUVEAU BLOC', color: 'cyan', open: true, entries: [
+    { id: uid(), label: 'Match', dur: parseInt(document.getElementById('defaultDur').value)||10, type: 'match' }
+  ]});
+  renderAll();
+}
+function addEntry(day, blocId) {
+  const b = data[day].find(b=>b.id===blocId);
+  if (b) {
+    b.entries.push({ id: uid(), label: 'Match', dur: parseInt(document.getElementById('defaultDur').value)||10, type: 'match' });
+    renderAll();
+  }
+}
+function updateEntry(day, blocId, entryId, key, val) {
+  const b = data[day].find(b=>b.id===blocId);
+  if (!b) return;
+  const e = b.entries.find(e=>e.id===entryId);
+  if (e) {
+    e[key] = key === 'dur' ? parseInt(val)||0 : val;
+    if (key === 'dur' || key === 'type') recalcAll();
+  }
+}
+function deleteEntry(day, blocId, entryId) {
+  const b = data[day].find(b=>b.id===blocId);
+  if (b) { b.entries = b.entries.filter(e=>e.id!==entryId); renderAll(); }
+}
+
+// ---- EXPORT ----
+function exportText() {
+  calcTimes('day1');
+  calcTimes('day2');
+  let out = `🕒 PLANNING DU TOURNOI\n`;
+  out += `═══════════════════════════════\n\n`;
+
+  for (const day of ['day1','day2']) {
+    out += day === 'day1' ? `📅 JOUR 1\n${'─'.repeat(30)}\n` : `\n📅 JOUR 2\n${'─'.repeat(30)}\n`;
+    for (const bloc of data[day]) {
+      const dot = {green:'🟢',yellow:'🟡',red:'🔴',orange:'🟠',purple:'🟣',cyan:'🔵',black:'⚫',white:'⚪'}[bloc.color]||'⚫';
+      out += `\n${dot} ${bloc.title}\n`;
+      for (const e of bloc.entries) {
+        const icon = e.type==='pause'?'☕ ':e.type==='battement'?'   ':'   ';
+        out += `${icon}${minToTime(e._start)} - ${minToTime(e._end)} | ${e.label} (${e.dur} min)\n`;
+      }
+    }
+  }
+
+  const box = document.getElementById('exportBox');
+  const ta = document.getElementById('exportText');
+  ta.value = out;
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+
+function copyExport() {
+  exportText();
+  const ta = document.getElementById('exportText');
+  ta.select();
+  document.execCommand('copy');
+  const btn = event.target;
+  btn.textContent = '✓ Copié !';
+  setTimeout(() => btn.textContent = 'Copier', 1500);
+}
+
+// ---- INIT ----
+initData();
+renderAll();
+</script>
+</body>
+</html>
