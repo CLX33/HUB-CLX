@@ -201,26 +201,46 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .ctab{flex:1;padding:12px;text-align:center;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text2);border:none;background:none;transition:all .15s;}
 .ctab:hover{color:var(--text);background:var(--bg3);}
 .ctab.active{background:rgba(253,86,239,.12);color:var(--accent);border-bottom:2px solid var(--accent);}
-/* Info joueurs */
-.caster-player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;}
-.cp-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;}
-.cp-card:hover{border-color:rgba(253,86,239,.3);}
-.cp-card-head{background:var(--bg3);padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.cp-pseudo{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text);letter-spacing:1px;text-transform:uppercase;background:transparent;border:none;outline:none;flex:1;}
-.cp-pseudo::placeholder{color:var(--text3);}
-.cp-pseudo:focus{color:var(--accent);}
-.cp-team-badge{font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid rgba(240,165,0,.4);color:var(--gold);white-space:nowrap;background:transparent;outline:none;cursor:text;}
-.cp-team-badge::placeholder{color:rgba(240,165,0,.3);}
-.cp-body{padding:14px;}
-.cp-field{margin-bottom:10px;}
-.cp-field label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;display:block;margin-bottom:4px;}
-.cp-field input,.cp-field select,.cp-field textarea{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--sans);font-size:13px;padding:7px 10px;border-radius:4px;outline:none;width:100%;transition:border-color .15s;}
-.cp-field input:focus,.cp-field select:focus,.cp-field textarea:focus{border-color:var(--accent);}
-.cp-field select option{background:var(--bg2);}
-.cp-field textarea{resize:vertical;min-height:60px;line-height:1.5;}
-.cp-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.cp-del{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;transition:color .15s;}
-.cp-del:hover{color:var(--accent);}
+
+/* ===== INFO TEAM ===== */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;}
+.team-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.team-card:hover{border-color:rgba(253,86,239,.35);box-shadow:0 0 30px rgba(253,86,239,.06);}
+/* Card top band with gradient */
+.team-card-band{height:5px;background:linear-gradient(90deg,var(--accent),var(--cyan));flex-shrink:0;}
+.team-card-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);position:relative;}
+.team-flag-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.team-flag-select{background:transparent;border:.5px solid var(--border);border-radius:4px;color:var(--text2);font-family:var(--mono);font-size:11px;padding:3px 6px;outline:none;cursor:pointer;}
+.team-flag-select option{background:var(--bg2);}
+.team-flag-display{font-size:22px;min-width:28px;text-align:center;}
+.team-del-btn{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:15px;transition:color .15s;padding:2px;}
+.team-del-btn:hover{color:var(--accent);}
+.team-name-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);letter-spacing:2px;text-transform:uppercase;width:100%;margin-bottom:4px;}
+.team-name-input::placeholder{color:var(--text3);}
+.team-name-input:focus{color:var(--accent);}
+.team-funfact-input{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text2);font-family:var(--sans);font-size:12px;width:100%;outline:none;resize:none;min-height:50px;line-height:1.4;transition:border-color .15s;margin-top:6px;}
+.team-funfact-input:focus{border-color:var(--accent);color:var(--text);}
+.team-funfact-input::placeholder{color:var(--text3);}
+.team-funfact-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-top:10px;display:block;}
+/* Players inside team card */
+.team-players{padding:16px 20px 20px;display:flex;flex-direction:column;gap:10px;}
+.team-player-row{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s;}
+.team-player-row:hover{border-color:rgba(253,86,239,.25);}
+.team-player-num{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:2px;min-width:22px;flex-shrink:0;}
+.team-player-pseudo{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);flex:1;letter-spacing:1px;text-transform:uppercase;}
+.team-player-pseudo::placeholder{color:var(--text3);}
+.team-player-pseudo:focus{color:var(--accent);}
+.team-player-class{display:flex;gap:4px;}
+.tcp{padding:3px 9px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;cursor:pointer;border:1px solid transparent;transition:all .15s;text-transform:uppercase;}
+.tcp.light{color:var(--light);border-color:rgba(96,216,250,.25);}
+.tcp.light.on,.tcp.light:hover{background:rgba(96,216,250,.15);border-color:var(--light);}
+.tcp.medium{color:var(--medium);border-color:rgba(62,207,142,.25);}
+.tcp.medium.on,.tcp.medium:hover{background:rgba(62,207,142,.15);border-color:var(--medium);}
+.tcp.heavy{color:var(--heavy);border-color:rgba(245,166,35,.25);}
+.tcp.heavy.on,.tcp.heavy:hover{background:rgba(245,166,35,.15);border-color:var(--heavy);}
+.team-add-btn{display:flex;align-items:center;gap:6px;padding:14px;color:var(--text2);cursor:pointer;font-size:12px;font-family:var(--sans);font-weight:600;border:1px dashed var(--border);border-radius:8px;background:none;width:100%;letter-spacing:1px;transition:all .15s;text-transform:uppercase;justify-content:center;margin-top:4px;}
+.team-add-btn:hover{border-color:var(--accent);color:var(--accent);}
+
 /* Fiches caster */
 .fiche-list{display:flex;flex-direction:column;gap:12px;}
 .fiche-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
@@ -231,12 +251,8 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .fiche-content{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;color:var(--text);font-family:var(--sans);font-size:14px;width:100%;resize:vertical;min-height:160px;outline:none;line-height:1.6;}
 .fiche-content:focus{border-color:var(--accent);}
 .fiche-content::placeholder{color:var(--text3);}
-.fiche-meta{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
-.fiche-tag{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;border:1px solid var(--border);color:var(--text2);}
 .add-fiche-btn{display:flex;align-items:center;gap:6px;padding:12px;color:var(--text2);cursor:pointer;font-size:12px;font-family:var(--sans);font-weight:600;border:1px dashed var(--border);border-radius:6px;background:none;width:100%;letter-spacing:1px;transition:all .15s;text-transform:uppercase;justify-content:center;}
 .add-fiche-btn:hover{border-color:var(--accent);color:var(--accent);}
-.add-cp-btn{display:flex;align-items:center;gap:6px;padding:12px;color:var(--text2);cursor:pointer;font-size:12px;font-family:var(--sans);font-weight:600;border:1px dashed var(--border);border-radius:6px;background:none;width:100%;letter-spacing:1px;transition:all .15s;text-transform:uppercase;justify-content:center;margin-top:8px;}
-.add-cp-btn:hover{border-color:var(--accent);color:var(--accent);}
 
 /* ===== AGENDA ===== */
 .ag-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;}
@@ -436,13 +452,13 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
       <div><div class="page-title">📡 Caster <span>CLX</span></div><div class="page-sub">Fiches joueurs & déroulement des streams</div></div>
     </div>
     <div class="caster-tabs">
-      <button class="ctab active" data-ctab="info" onclick="switchCasterTab('info')">👤 Info Joueurs</button>
+      <button class="ctab active" data-ctab="info" onclick="switchCasterTab('info')">🏳️ Info Team</button>
       <button class="ctab" data-ctab="fiche" onclick="switchCasterTab('fiche')">📋 Fiches Stream</button>
     </div>
-    <!-- Info joueurs -->
+    <!-- Info Team -->
     <div id="caster-info" class="caster-sub active">
-      <div class="caster-player-grid" id="cpGrid"></div>
-      <button class="add-cp-btn" onclick="addCasterPlayer()">+ Ajouter un joueur</button>
+      <div class="team-grid" id="teamGrid"></div>
+      <button class="team-add-btn" style="margin-top:16px" onclick="addTeam()">+ Ajouter une équipe</button>
     </div>
     <!-- Fiches -->
     <div id="caster-fiche" class="caster-sub" style="display:none">
@@ -756,58 +772,60 @@ function renderStaff(){
 }
 
 /* ===== CASTER ===== */
-let casterPlayers=JSON.parse(localStorage.getItem('clx-caster-players')||'[]');
+const FLAGS=[
+  {code:'',flag:'🏳️',label:'Aucun'},{code:'fr',flag:'🇫🇷',label:'France'},{code:'be',flag:'🇧🇪',label:'Belgique'},
+  {code:'ch',flag:'🇨🇭',label:'Suisse'},{code:'ca',flag:'🇨🇦',label:'Canada'},{code:'us',flag:'🇺🇸',label:'USA'},
+  {code:'uk',flag:'🇬🇧',label:'UK'},{code:'de',flag:'🇩🇪',label:'Allemagne'},{code:'es',flag:'🇪🇸',label:'Espagne'},
+  {code:'it',flag:'🇮🇹',label:'Italie'},{code:'pt',flag:'🇵🇹',label:'Portugal'},{code:'nl',flag:'🇳🇱',label:'Pays-Bas'},
+  {code:'pl',flag:'🇵🇱',label:'Pologne'},{code:'se',flag:'🇸🇪',label:'Suède'},{code:'dk',flag:'🇩🇰',label:'Danemark'},
+  {code:'no',flag:'🇳🇴',label:'Norvège'},{code:'fi',flag:'🇫🇮',label:'Finlande'},{code:'br',flag:'🇧🇷',label:'Brésil'},
+  {code:'ar',flag:'🇦🇷',label:'Argentine'},{code:'mx',flag:'🇲🇽',label:'Mexique'},{code:'jp',flag:'🇯🇵',label:'Japon'},
+  {code:'kr',flag:'🇰🇷',label:'Corée'},{code:'au',flag:'🇦🇺',label:'Australie'},{code:'ma',flag:'🇲🇦',label:'Maroc'},
+  {code:'dz',flag:'🇩🇿',label:'Algérie'},{code:'tn',flag:'🇹🇳',label:'Tunisie'},{code:'sn',flag:'🇸🇳',label:'Sénégal'},
+];
+let casterTeams=JSON.parse(localStorage.getItem('clx-caster-teams')||'[]');
 let casterFiches=JSON.parse(localStorage.getItem('clx-caster-fiches')||'[]');
-const MAPS_LIST=['Monaco','Seoul','Skyway','Stadium','Las Vegas','SYS$HORIZON','Fortune Stadium','Bernal','NOZOMI/CITADEL','Fangwai City','Kyoto'];
-const CLASSES=['','LIGHT','MEDIUM','HEAVY'];
-function cpSave(){localStorage.setItem('clx-caster-players',JSON.stringify(casterPlayers));}
+function teamsSave(){localStorage.setItem('clx-caster-teams',JSON.stringify(casterTeams));}
 function ficheSave(){localStorage.setItem('clx-caster-fiches',JSON.stringify(casterFiches));}
-function addCasterPlayer(){casterPlayers.push({id:uid(),pseudo:'',team:'',cls:'',age:'',nationnality:'',mainMap:'',kd:'',winrate:'',playtime:'',speciality:'',anecdote:'',bio:''});cpSave();renderCaster();}
-function deleteCasterPlayer(id){if(!confirm('Supprimer ?'))return;casterPlayers=casterPlayers.filter(p=>p.id!==id);cpSave();renderCaster();}
-function updateCasterPlayer(id,key,val){const p=casterPlayers.find(p=>p.id===id);if(p){p[key]=val;cpSave();}}
+function makeTeam(){return{id:uid(),name:'',flag:'',funfact:'',players:[{id:uid(),pseudo:'',cls:''},{id:uid(),pseudo:'',cls:''},{id:uid(),pseudo:'',cls:''}]};}
+function addTeam(){casterTeams.push(makeTeam());teamsSave();renderCaster();}
+function deleteTeam(id){if(!confirm('Supprimer cette équipe ?'))return;casterTeams=casterTeams.filter(t=>t.id!==id);teamsSave();renderCaster();}
+function updateTeam(id,key,val){const t=casterTeams.find(t=>t.id===id);if(t){t[key]=val;teamsSave();if(key==='flag')renderCaster();}}
+function updateTeamPlayer(tid,pid,key,val){const t=casterTeams.find(t=>t.id===tid);if(!t)return;const p=t.players.find(p=>p.id===pid);if(p){p[key]=val;teamsSave();}}
+function togglePlayerClass(tid,pid,cls){const t=casterTeams.find(t=>t.id===tid);if(!t)return;const p=t.players.find(p=>p.id===pid);if(p){p.cls=p.cls===cls?'':cls;teamsSave();renderCaster();}}
 function addFiche(){casterFiches.push({id:uid(),title:'NOUVELLE FICHE',type:'intro',content:'',notes:''});ficheSave();renderCaster();}
 function deleteFiche(id){if(!confirm('Supprimer cette fiche ?'))return;casterFiches=casterFiches.filter(f=>f.id!==id);ficheSave();renderCaster();}
 function updateFiche(id,key,val){const f=casterFiches.find(f=>f.id===id);if(f){f[key]=val;ficheSave();}}
 function renderCaster(){
-  // Info joueurs
-  const grid=document.getElementById('cpGrid');grid.innerHTML='';
-  if(!casterPlayers.length){grid.innerHTML=`<div class="empty-state"><h2>Aucun joueur</h2><p>Ajoute les joueurs à commenter.</p></div>`;}
-  casterPlayers.forEach(p=>{
-    const card=document.createElement('div');card.className='cp-card';
-    const clsColor=p.cls==='LIGHT'?'var(--light)':p.cls==='MEDIUM'?'var(--medium)':p.cls==='HEAVY'?'var(--heavy)':'var(--text2)';
+  // Info Team
+  const grid=document.getElementById('teamGrid');grid.innerHTML='';
+  if(!casterTeams.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><h2>Aucune équipe</h2><p>Ajoute les équipes participantes.</p></div>`;}
+  casterTeams.forEach(team=>{
+    const flagObj=FLAGS.find(f=>f.code===team.flag)||FLAGS[0];
+    const card=document.createElement('div');card.className='team-card';
     card.innerHTML=`
-      <div class="cp-card-head">
-        <input class="cp-pseudo" value="${esc(p.pseudo)}" placeholder="PSEUDO..." oninput="updateCasterPlayer('${p.id}','pseudo',this.value)">
-        <input class="cp-team-badge" value="${esc(p.team)}" placeholder="Équipe..." oninput="updateCasterPlayer('${p.id}','team',this.value)" style="width:90px">
-        <button class="cp-del" onclick="deleteCasterPlayer('${p.id}')">✕</button>
+      <div class="team-card-band"></div>
+      <div class="team-card-head">
+        <div class="team-flag-row">
+          <span class="team-flag-display">${flagObj.flag}</span>
+          <select class="team-flag-select" onchange="updateTeam('${team.id}','flag',this.value)">${FLAGS.map(f=>`<option value="${f.code}" ${team.flag===f.code?'selected':''}>${f.flag} ${f.label}</option>`).join('')}</select>
+        </div>
+        <button class="team-del-btn" onclick="deleteTeam('${team.id}')">✕</button>
+        <input class="team-name-input" value="${esc(team.name)}" placeholder="NOM DE L'ÉQUIPE..." oninput="updateTeam('${team.id}','name',this.value)">
+        <span class="team-funfact-label">⭐ Fun fact / Anecdote</span>
+        <textarea class="team-funfact-input" placeholder="ex: Cette équipe a remporté les 3 derniers tournois CLX..." oninput="updateTeam('${team.id}','funfact',this.value)">${esc(team.funfact||'')}</textarea>
       </div>
-      <div class="cp-body">
-        <div class="cp-row2">
-          <div class="cp-field"><label>Classe</label>
-            <select onchange="updateCasterPlayer('${p.id}','cls',this.value);this.style.color=this.value==='LIGHT'?'var(--light)':this.value==='MEDIUM'?'var(--medium)':this.value==='HEAVY'?'var(--heavy)':'var(--text2)'" style="color:${clsColor}">
-              ${CLASSES.map(c=>`<option value="${c}" ${p.cls===c?'selected':''}>${c||'— Classe —'}</option>`).join('')}
-            </select>
-          </div>
-          <div class="cp-field"><label>Map principale</label>
-            <select onchange="updateCasterPlayer('${p.id}','mainMap',this.value)">
-              <option value="">— Map —</option>${MAPS_LIST.map(m=>`<option ${p.mainMap===m?'selected':''}>${m}</option>`).join('')}
-            </select>
-          </div>
-        </div>
-        <div class="cp-row2">
-          <div class="cp-field"><label>Âge</label><input value="${esc(p.age||'')}" placeholder="ex: 22 ans" oninput="updateCasterPlayer('${p.id}','age',this.value)"></div>
-          <div class="cp-field"><label>Nationalité</label><input value="${esc(p.nationnality||'')}" placeholder="ex: 🇫🇷 Français" oninput="updateCasterPlayer('${p.id}','nationnality',this.value)"></div>
-        </div>
-        <div class="cp-row2">
-          <div class="cp-field"><label>K/D ratio</label><input value="${esc(p.kd||'')}" placeholder="ex: 1.45" oninput="updateCasterPlayer('${p.id}','kd',this.value)"></div>
-          <div class="cp-field"><label>Win rate</label><input value="${esc(p.winrate||'')}" placeholder="ex: 58%" oninput="updateCasterPlayer('${p.id}','winrate',this.value)"></div>
-        </div>
-        <div class="cp-row2">
-          <div class="cp-field"><label>Heures de jeu</label><input value="${esc(p.playtime||'')}" placeholder="ex: 1 200h" oninput="updateCasterPlayer('${p.id}','playtime',this.value)"></div>
-          <div class="cp-field"><label>Spécialité</label><input value="${esc(p.speciality||'')}" placeholder="ex: Fragger, Support..." oninput="updateCasterPlayer('${p.id}','speciality',this.value)"></div>
-        </div>
-        <div class="cp-field"><label>Anecdote / Fun fact</label><input value="${esc(p.anecdote||'')}" placeholder="ex: A gagné 3 tournois d'affilée..." oninput="updateCasterPlayer('${p.id}','anecdote',this.value)"></div>
-        <div class="cp-field"><label>Bio / Présentation</label><textarea oninput="updateCasterPlayer('${p.id}','bio',this.value)">${esc(p.bio||'')}</textarea></div>
+      <div class="team-players">
+        ${team.players.map((p,i)=>`
+          <div class="team-player-row">
+            <span class="team-player-num">#${i+1}</span>
+            <input class="team-player-pseudo" value="${esc(p.pseudo)}" placeholder="PSEUDO JOUEUR ${i+1}..." oninput="updateTeamPlayer('${team.id}','${p.id}','pseudo',this.value)">
+            <div class="team-player-class">
+              <span class="tcp light ${p.cls==='LIGHT'?'on':''}" onclick="togglePlayerClass('${team.id}','${p.id}','LIGHT')" title="Light">⚡</span>
+              <span class="tcp medium ${p.cls==='MEDIUM'?'on':''}" onclick="togglePlayerClass('${team.id}','${p.id}','MEDIUM')" title="Medium">🛡️</span>
+              <span class="tcp heavy ${p.cls==='HEAVY'?'on':''}" onclick="togglePlayerClass('${team.id}','${p.id}','HEAVY')" title="Heavy">💪</span>
+            </div>
+          </div>`).join('')}
       </div>`;
     grid.appendChild(card);
   });
@@ -826,10 +844,10 @@ function renderCaster(){
           <option value="fin" ${f.type==='fin'?'selected':''}>Fin de stream</option>
           <option value="custom" ${f.type==='custom'?'selected':''}>Autre</option>
         </select>
-        <button class="cp-del" onclick="deleteFiche('${f.id}')">✕</button>
+        <button style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;margin-left:auto;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'" onclick="deleteFiche('${f.id}')">✕</button>
       </div>
       <div class="fiche-body">
-        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:6px;">Contenu / Script</div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:6px;">Script / Contenu</div>
         <textarea class="fiche-content" placeholder="Écris ici le script, les éléments à dire, les points importants..." oninput="updateFiche('${f.id}','content',this.value)">${esc(f.content||'')}</textarea>
         <div style="margin-top:8px">
           <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-bottom:4px;">Notes internes</div>
