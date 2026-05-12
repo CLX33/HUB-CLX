@@ -193,8 +193,25 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .staff-add-btn:hover{border-color:var(--accent);color:var(--accent);}
 .staff-del-btn{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;transition:color .15s;padding:2px;}
 .staff-del-btn:hover{color:var(--accent);}
-.staff-role-select{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:4px;outline:none;cursor:pointer;}
+.staff-role-select{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:4px;outline:none;cursor:pointer;transition:color .15s,border-color .15s;}
 .staff-role-select option{background:var(--bg2);}
+.fiche-type-select{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;outline:none;cursor:pointer;transition:color .15s,border-color .15s;}
+.fiche-type-select option{background:var(--bg2);}
+/* Staff role select colors */
+.staff-role-select.role-Manager{color:#fd56ef;border-color:rgba(253,86,239,.4);}
+.staff-role-select.role-Coach{color:#0eb8c4;border-color:rgba(14,184,196,.4);}
+.staff-role-select.role-Analyste{color:#60a5fa;border-color:rgba(96,165,250,.4);}
+.staff-role-select.role-Streamer{color:#f0a500;border-color:rgba(240,165,0,.4);}
+.staff-role-select.role-Arbitre{color:#f16679;border-color:rgba(241,102,121,.4);}
+.staff-role-select.role-Support{color:#3ecf8e;border-color:rgba(62,207,142,.4);}
+.staff-role-select.role-Communication{color:#8e44ad;border-color:rgba(142,68,173,.4);}
+.staff-role-select.role-Autre{color:#94a3b8;border-color:rgba(148,163,184,.4);}
+/* Fiche type select colors */
+.fiche-type-select.type-intro{color:#fd56ef;border-color:rgba(253,86,239,.4);}
+.fiche-type-select.type-annonce{color:#f0a500;border-color:rgba(240,165,0,.4);}
+.fiche-type-select.type-pause{color:#60a5fa;border-color:rgba(96,165,250,.4);}
+.fiche-type-select.type-fin{color:#f16679;border-color:rgba(241,102,121,.4);}
+.fiche-type-select.type-custom{color:#3ecf8e;border-color:rgba(62,207,142,.4);}
 
 /* ===== CASTER ===== */
 .caster-tabs{display:flex;gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:2rem;}
@@ -751,6 +768,11 @@ function staffSave(){localStorage.setItem('clx-staff',JSON.stringify(staffList))
 function addStaff(){staffList.push({id:uid(),name:'',role:'Manager',discord:'',contact:''});staffSave();renderStaff();}
 function deleteStaffMember(id){if(!confirm('Supprimer ?'))return;staffList=staffList.filter(s=>s.id!==id);staffSave();renderStaff();}
 function updateStaff(id,key,val){const s=staffList.find(s=>s.id===id);if(s){s[key]=val;staffSave();}}
+const ROLE_COLORS={Manager:'#fd56ef',Coach:'#0eb8c4',Analyste:'#60a5fa',Streamer:'#f0a500',Arbitre:'#f16679',Support:'#3ecf8e',Communication:'#8e44ad',Autre:'#94a3b8'};
+const FICHE_COLORS={intro:'#fd56ef',annonce:'#f0a500',pause:'#60a5fa',fin:'#f16679',custom:'#3ecf8e'};
+function applySelectColor(sel,colorMap,val){const c=colorMap[val]||'var(--text2)';sel.style.color=c;sel.style.borderColor=c?c.replace('#','rgba(').replace(/^rgba\(/,'rgba(')+'33)':'';}
+function staffRoleColor(sel,role){const c=ROLE_COLORS[role]||'#94a3b8';sel.style.color=c;sel.style.borderColor=c+'55';}
+function ficheTypeColor(sel,type){const c=FICHE_COLORS[type]||'#94a3b8';sel.style.color=c;sel.style.borderColor=c+'55';}
 function renderStaff(){
   const grid=document.getElementById('staffGrid');grid.innerHTML='';
   if(!staffList.length){grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><h2>Aucun membre</h2><p>Ajoute les membres de ton staff.</p></div>`;return;}
@@ -758,7 +780,7 @@ function renderStaff(){
     const card=document.createElement('div');card.className='staff-card';
     card.innerHTML=`
       <div class="staff-card-head">
-        <select class="staff-role-select" onchange="updateStaff('${s.id}','role',this.value)">${STAFF_ROLES.map(r=>`<option ${s.role===r?'selected':''}>${r}</option>`).join('')}</select>
+        <select class="staff-role-select" id="srole-${s.id}" onchange="updateStaff('${s.id}','role',this.value);staffRoleColor(this,this.value)">${STAFF_ROLES.map(r=>`<option ${s.role===r?'selected':''}>${r}</option>`).join('')}</select>
         <span class="staff-role-badge">${s.role||'Staff'}</span>
         <button class="staff-del-btn" onclick="deleteStaffMember('${s.id}')">✕</button>
       </div>
@@ -768,6 +790,9 @@ function renderStaff(){
         <div class="staff-field"><label>Contact / Rôle détaillé</label><input value="${esc(s.contact||'')}" placeholder="ex: Responsable stream, arbitre..." oninput="updateStaff('${s.id}','contact',this.value)"></div>
       </div>`;
     grid.appendChild(card);
+    // Apply color after DOM insert
+    const sel=card.querySelector(`#srole-${s.id}`);
+    if(sel)staffRoleColor(sel,s.role||'Autre');
   });
 }
 
