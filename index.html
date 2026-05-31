@@ -220,43 +220,34 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .ctab.active{background:rgba(253,86,239,.12);color:var(--accent);border-bottom:2px solid var(--accent);}
 
 /* ===== INFO TEAM ===== */
-.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:24px;}
-.team-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
-.team-card:hover{border-color:rgba(253,86,239,.35);box-shadow:0 0 30px rgba(253,86,239,.06);}
-/* Card top band with gradient */
-.team-card-band{height:5px;background:linear-gradient(90deg,var(--accent),var(--cyan));flex-shrink:0;}
-.team-card-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);position:relative;}
-.team-flag-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.team-flag-select{background:transparent;border:.5px solid var(--border);border-radius:4px;color:var(--text2);font-family:var(--mono);font-size:11px;padding:3px 6px;outline:none;cursor:pointer;}
+.team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.team-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.team-card:hover{border-color:rgba(253,86,239,.35);box-shadow:0 0 20px rgba(253,86,239,.05);}
+.team-card-band{height:3px;background:linear-gradient(90deg,var(--accent),var(--cyan));flex-shrink:0;}
+.team-card-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);position:relative;}
+.team-flag-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.team-flag-select{background:transparent;border:.5px solid var(--border);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 4px;outline:none;cursor:pointer;max-width:90px;}
 .team-flag-select option{background:var(--bg2);}
-.team-flag-display{font-size:22px;min-width:28px;text-align:center;}
-.team-del-btn{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:15px;transition:color .15s;padding:2px;}
+.team-flag-display{font-size:16px;min-width:20px;text-align:center;}
+.team-del-btn{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:12px;transition:color .15s;padding:2px;}
 .team-del-btn:hover{color:var(--accent);}
-.team-name-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;width:100%;margin-bottom:4px;}
+.team-name-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:13px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;width:100%;margin-bottom:3px;}
 .team-name-input::placeholder{color:var(--text3);}
-.team-name-input:focus{color:var(--accent);filter:brightness(1.2);}
-.team-funfact-input{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text2);font-family:var(--sans);font-size:12px;width:100%;outline:none;resize:none;min-height:50px;line-height:1.4;transition:border-color .15s;margin-top:6px;}
+.team-funfact-input{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:4px;padding:5px 8px;color:var(--text2);font-family:var(--sans);font-size:10px;width:100%;outline:none;resize:none;min-height:36px;line-height:1.4;transition:border-color .15s;margin-top:4px;}
 .team-funfact-input:focus{border-color:var(--accent);color:var(--text);}
 .team-funfact-input::placeholder{color:var(--text3);}
-.team-funfact-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-top:10px;display:block;}
-/* Players inside team card */
-.team-players{padding:16px 20px 20px;display:flex;flex-direction:column;gap:10px;}
-.team-player-row{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:border-color .15s;}
-.team-player-row:hover{border-color:rgba(253,86,239,.25);}
-.team-player-num{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:2px;min-width:22px;flex-shrink:0;}
-.team-player-pseudo{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);flex:1;letter-spacing:1px;text-transform:uppercase;}
+.team-funfact-label{font-family:var(--mono);font-size:7px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;margin-top:6px;display:block;}
+.team-players{padding:8px 10px 10px;display:flex;flex-direction:column;gap:5px;}
+.team-player-row{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:7px 10px;display:flex;align-items:center;gap:8px;transition:border-color .15s;}
+.team-player-row:hover{border-color:rgba(253,86,239,.2);}
+.team-player-num{font-family:var(--mono);font-size:8px;color:var(--text2);letter-spacing:1px;min-width:16px;flex-shrink:0;}
+.team-player-pseudo{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);flex:1;letter-spacing:.5px;text-transform:uppercase;}
 .team-player-pseudo::placeholder{color:var(--text3);}
-.team-player-pseudo:focus{color:var(--accent);}
-.team-player-class{display:flex;gap:4px;}
-.tcp{padding:3px 9px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.5px;cursor:pointer;border:1px solid transparent;transition:all .15s;text-transform:uppercase;}
-.tcp.light{color:var(--light);border-color:rgba(96,216,250,.25);}
-.tcp.light.on,.tcp.light:hover{background:rgba(96,216,250,.15);border-color:var(--light);}
-.tcp.medium{color:var(--medium);border-color:rgba(62,207,142,.25);}
-.tcp.medium.on,.tcp.medium:hover{background:rgba(62,207,142,.15);border-color:var(--medium);}
-.tcp.heavy{color:var(--heavy);border-color:rgba(245,166,35,.25);}
-.tcp.heavy.on,.tcp.heavy:hover{background:rgba(245,166,35,.15);border-color:var(--heavy);}
-.team-add-btn{display:flex;align-items:center;gap:6px;padding:14px;color:var(--text2);cursor:pointer;font-size:12px;font-family:var(--sans);font-weight:600;border:1px dashed var(--border);border-radius:8px;background:none;width:100%;letter-spacing:1px;transition:all .15s;text-transform:uppercase;justify-content:center;margin-top:4px;}
+.team-player-pseudo:focus{color:var(--accent);filter:brightness(1.15);}
+.team-add-btn{display:flex;align-items:center;gap:6px;padding:10px;color:var(--text2);cursor:pointer;font-size:11px;font-family:var(--sans);font-weight:600;border:1px dashed var(--border);border-radius:6px;background:none;width:100%;letter-spacing:1px;transition:all .15s;text-transform:uppercase;justify-content:center;margin-top:4px;}
 .team-add-btn:hover{border-color:var(--accent);color:var(--accent);}
+@media(max-width:1100px){.team-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:750px){.team-grid{grid-template-columns:repeat(2,1fr);}}
 
 /* Fiches caster */
 .fiche-list{display:flex;flex-direction:column;gap:12px;}
@@ -844,12 +835,7 @@ function renderCaster(){
         ${team.players.map((p,i)=>`
           <div class="team-player-row">
             <span class="team-player-num">#${i+1}</span>
-            <input class="team-player-pseudo" value="${esc(p.pseudo)}" placeholder="PSEUDO JOUEUR ${i+1}..." oninput="updateTeamPlayer('${team.id}','${p.id}','pseudo',this.value)">
-            <div class="team-player-class">
-              <span class="tcp light ${p.cls==='LIGHT'?'on':''}" onclick="togglePlayerClass('${team.id}','${p.id}','LIGHT')" title="Light">⚡</span>
-              <span class="tcp medium ${p.cls==='MEDIUM'?'on':''}" onclick="togglePlayerClass('${team.id}','${p.id}','MEDIUM')" title="Medium">🛡️</span>
-              <span class="tcp heavy ${p.cls==='HEAVY'?'on':''}" onclick="togglePlayerClass('${team.id}','${p.id}','HEAVY')" title="Heavy">💪</span>
-            </div>
+            <input class="team-player-pseudo" value="${esc(p.pseudo)}" placeholder="JOUEUR ${i+1}..." oninput="updateTeamPlayer('${team.id}','${p.id}','pseudo',this.value)">
           </div>`).join('')}
       </div>`;
     grid.appendChild(card);
