@@ -232,9 +232,9 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .team-flag-display{font-size:22px;min-width:28px;text-align:center;}
 .team-del-btn{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:15px;transition:color .15s;padding:2px;}
 .team-del-btn:hover{color:var(--accent);}
-.team-name-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);letter-spacing:2px;text-transform:uppercase;width:100%;margin-bottom:4px;}
+.team-name-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);letter-spacing:2px;text-transform:uppercase;width:100%;margin-bottom:4px;}
 .team-name-input::placeholder{color:var(--text3);}
-.team-name-input:focus{color:var(--accent);}
+.team-name-input:focus{color:var(--accent);filter:brightness(1.2);}
 .team-funfact-input{background:rgba(255,255,255,.03);border:.5px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text2);font-family:var(--sans);font-size:12px;width:100%;outline:none;resize:none;min-height:50px;line-height:1.4;transition:border-color .15s;margin-top:6px;}
 .team-funfact-input:focus{border-color:var(--accent);color:var(--text);}
 .team-funfact-input::placeholder{color:var(--text3);}
@@ -862,7 +862,7 @@ function renderCaster(){
     card.innerHTML=`
       <div class="fiche-head">
         <input class="fiche-title-input" value="${esc(f.title)}" placeholder="TITRE DE LA FICHE..." oninput="updateFiche('${f.id}','title',this.value)">
-        <select style="background:var(--bg2);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:4px;outline:none" onchange="updateFiche('${f.id}','type',this.value)">
+        <select class="fiche-type-select" id="ftype-${f.id}" onchange="updateFiche('${f.id}','type',this.value);ficheTypeColor(this,this.value)">
           <option value="intro" ${f.type==='intro'?'selected':''}>Intro Stream</option>
           <option value="annonce" ${f.type==='annonce'?'selected':''}>Annonce</option>
           <option value="pause" ${f.type==='pause'?'selected':''}>Pause</option>
@@ -880,6 +880,8 @@ function renderCaster(){
         </div>
       </div>`;
     ficheList.appendChild(card);
+    const ftSel=card.querySelector(`#ftype-${f.id}`);
+    if(ftSel)ficheTypeColor(ftSel,f.type||'intro');
   });
 }
 
