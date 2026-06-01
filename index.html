@@ -4,6 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CLX HUB</title>
+<!-- Firebase Compat SDK (fonctionne partout) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAoIKb5LepYwUmONiuwEM8M1nTUXptH2RE",
+    authDomain: "clx-tournament.firebaseapp.com",
+    projectId: "clx-tournament",
+    storageBucket: "clx-tournament.firebasestorage.app",
+    messagingSenderId: "270703807268",
+    appId: "1:270703807268:web:1e6e523ab933210b1bc1b1"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  window._fbSet = async function(docId, data) {
+    try { await db.collection('clxhub').doc(docId).set({data: JSON.stringify(data)}); } catch(e){ console.warn('fbSet',e); }
+  };
+  window._fbGet = async function(docId) {
+    try { const snap = await db.collection('clxhub').doc(docId).get(); return snap.exists ? JSON.parse(snap.data().data) : null; } catch(e){ return null; }
+  };
+  window._fbListen = function(docId, cb) {
+    return db.collection('clxhub').doc(docId).onSnapshot(snap => { if(snap.exists) cb(JSON.parse(snap.data().data)); });
+  };
+  window._fbReady = true;
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -683,13 +710,13 @@ function uid(){return Math.random().toString(36).slice(2,9);}
 function timeToMin(s){const[h,m]=s.split(':').map(Number);return h*60+m;}
 function minToTime(m){const h=Math.floor(m/60)%24,mn=m%60;return`${String(h).padStart(2,'0')}:${String(mn).padStart(2,'0')}`;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function pSave(){
+function pSave_local(){
   try{localStorage.setItem('clxHub_v2',JSON.stringify({tournaments,activeTournamentId}));}catch(e){}
   clearTimeout(saveTimer);saveTimer=setTimeout(()=>{const el=document.getElementById('saveIndicator');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800);},400);
 }
 function pLoad(){
   try{const raw=localStorage.getItem('clxHub_v2')||localStorage.getItem('clxHub_v1')||localStorage.getItem('tournoiPro_v4');if(raw){const d=JSON.parse(raw);tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;}}catch(e){}
-  if(Object.keys(tournaments).length===0){const t=makeDefT('Mon Premier Tournoi');tournaments[t.id]=t;activeTournamentId=t.id;pSave();}
+  if(Object.keys(tournaments).length===0){const t=makeDefT('Mon Premier Tournoi');tournaments[t.id]=t;activeTournamentId=t.id;}
   if(!tournaments[activeTournamentId])activeTournamentId=Object.keys(tournaments)[0]||null;
 }
 function migrateT(t){if(!t.days){t.days=[];if(t.day1){t.days.push({id:uid(),name:'JOUR 1',start:t.startDay1||'10:00',blocs:t.day1});delete t.day1;}if(t.day2){t.days.push({id:uid(),name:'JOUR 2',start:t.startDay2||'14:00',blocs:t.day2});delete t.day2;}delete t.startDay1;delete t.startDay2;}return t;}
@@ -755,7 +782,7 @@ function doCopy(){const text=buildExport();navigator.clipboard.writeText(text).c
 /* ===== STAFF ===== */
 let staffList=JSON.parse(localStorage.getItem('clx-staff')||'[]');
 const STAFF_ROLES=['Manager','Coach','Analyste','Streamer','Arbitre','Support','Communication','Autre'];
-function staffSave(){localStorage.setItem('clx-staff',JSON.stringify(staffList));}
+function staffSave_local(){localStorage.setItem('clx-staff',JSON.stringify(staffList));}
 function addStaff(){staffList.push({id:uid(),name:'',role:'Manager',discord:'',contact:''});staffSave();renderStaff();}
 function deleteStaffMember(id){if(!confirm('Supprimer ?'))return;staffList=staffList.filter(s=>s.id!==id);staffSave();renderStaff();}
 function updateStaff(id,key,val){const s=staffList.find(s=>s.id===id);if(s){s[key]=val;staffSave();}}
@@ -801,8 +828,8 @@ const FLAGS=[
 ];
 let casterTeams=JSON.parse(localStorage.getItem('clx-caster-teams')||'[]');
 let casterFiches=JSON.parse(localStorage.getItem('clx-caster-fiches')||'[]');
-function teamsSave(){localStorage.setItem('clx-caster-teams',JSON.stringify(casterTeams));}
-function ficheSave(){localStorage.setItem('clx-caster-fiches',JSON.stringify(casterFiches));}
+function teamsSave_local(){localStorage.setItem('clx-caster-teams',JSON.stringify(casterTeams));}
+function ficheSave_local(){localStorage.setItem('clx-caster-fiches',JSON.stringify(casterFiches));}
 function makeTeam(){return{id:uid(),name:'',flag:'',funfact:'',players:[{id:uid(),pseudo:'',cls:''},{id:uid(),pseudo:'',cls:''},{id:uid(),pseudo:'',cls:''}]};}
 function addTeam(){casterTeams.push(makeTeam());teamsSave();renderCaster();}
 function deleteTeam(id){if(!confirm('Supprimer cette équipe ?'))return;casterTeams=casterTeams.filter(t=>t.id!==id);teamsSave();renderCaster();}
@@ -881,7 +908,7 @@ let agWeekOffset=0;
 let agEvents=JSON.parse(localStorage.getItem('clx-agenda')||'{}');
 let agAbsences=JSON.parse(localStorage.getItem('clx-absences')||'[]');
 let agCurrentKey=null;
-function agSave(){localStorage.setItem('clx-agenda',JSON.stringify(agEvents));localStorage.setItem('clx-absences',JSON.stringify(agAbsences));}
+function agSave_local(){localStorage.setItem('clx-agenda',JSON.stringify(agEvents));localStorage.setItem('clx-absences',JSON.stringify(agAbsences));}
 function agGetMonday(offset){const now=new Date();const dow=now.getDay();const diff=dow===0?-6:1-dow;const mon=new Date(now);mon.setDate(now.getDate()+diff+offset*7);mon.setHours(0,0,0,0);return mon;}
 function agDateKey(d){return d.toISOString().slice(0,10);}
 function agIsToday(d){const t=new Date();return d.getDate()===t.getDate()&&d.getMonth()===t.getMonth()&&d.getFullYear()===t.getFullYear();}
@@ -946,7 +973,7 @@ document.getElementById('ag-copy-btn').onclick=()=>navigator.clipboard.writeText
 const HTYPES={win:{emoji:'🏆',label:'Victoire',badgeCls:'hb-win',pillCls:'hp-win',scoreCls:'hs-win'},loss:{emoji:'💀',label:'Défaite',badgeCls:'hb-loss',pillCls:'hp-loss',scoreCls:'hs-loss'},draw:{emoji:'🤝',label:'Nul',badgeCls:'hb-draw',pillCls:'hp-draw',scoreCls:'hs-draw'},event:{emoji:'🎉',label:'Événement',badgeCls:'hb-event',pillCls:'hp-event',scoreCls:''},other:{emoji:'📌',label:'Autre',badgeCls:'hb-other',pillCls:'hp-other',scoreCls:''}};
 let hEvents=JSON.parse(localStorage.getItem('clx-history')||'[]');
 let hEditId=null,hFilter='all',hMapFilter='',hSearchQ='',hSection='scrim';
-function hSave(){localStorage.setItem('clx-history',JSON.stringify(hEvents));}
+function hSave_local(){localStorage.setItem('clx-history',JSON.stringify(hEvents));}
 function hUid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function hFmt(s){if(!s)return'';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
 function switchHSec(sec){hSection=sec;document.querySelectorAll('.hsec-tab').forEach(t=>{t.classList.remove('active');if(t.dataset.hsec===sec)t.classList.add('active');});histRenderStats();histRenderList();}
@@ -1010,10 +1037,7 @@ if(!rosterData){rosterData={name:'ROSTER CLX',players:[
   {id:uid(),pseudo:'',cls:'',kd:'',wr:'',playtime:'',role:'',discord:'',age:'',mainMap:'',notes:''},
   {id:uid(),pseudo:'',cls:'',kd:'',wr:'',playtime:'',role:'',discord:'',age:'',mainMap:'',notes:''}
 ]};}
-function saveRoster(){
-  rosterData.name=document.getElementById('rosterNameBig').value;
-  localStorage.setItem('clx-roster-v2',JSON.stringify(rosterData));
-}
+function saveRoster_local(){rosterData.name=document.getElementById('rosterNameBig').value;localStorage.setItem('clx-roster-v2',JSON.stringify(rosterData));}
 function updatePlayerField(idx,key,val){rosterData.players[idx][key]=val;localStorage.setItem('clx-roster-v2',JSON.stringify(rosterData));}
 function selectClass(idx,cls){rosterData.players[idx].cls=cls;localStorage.setItem('clx-roster-v2',JSON.stringify(rosterData));renderRoster();}
 function renderRoster(){
@@ -1054,8 +1078,72 @@ function renderRoster(){
   });
 }
 
-/* ===== INIT ===== */
-pLoad();renderSidebar();renderApp();agRender();histRenderStats();histRenderList();renderRoster();renderStaff();renderCaster();
+/* ===== INIT FIREBASE ===== */
+async function initApp() {
+  showSyncBanner('Connexion à Firebase...');
+
+  // ---- PLANNING ----
+  const pData = await window._fbGet('planning');
+  if (pData) { tournaments = pData.tournaments||{}; activeTournamentId = pData.activeTournamentId||null; }
+  if (Object.keys(tournaments).length===0){ const t=makeDefT('Mon Premier Tournoi');tournaments[t.id]=t;activeTournamentId=t.id; }
+  if (!tournaments[activeTournamentId]) activeTournamentId = Object.keys(tournaments)[0]||null;
+  window._fbListen('planning', d=>{ tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;renderSidebar();renderApp(); });
+
+  // ---- STAFF ----
+  const sData = await window._fbGet('staff');
+  if (sData) staffList = sData;
+  window._fbListen('staff', d=>{ staffList=d; if(currentTab==='staff')renderStaff(); });
+
+  // ---- CASTER TEAMS ----
+  const ctData = await window._fbGet('casterTeams');
+  if (ctData) casterTeams = ctData;
+  window._fbListen('casterTeams', d=>{ casterTeams=d; if(currentTab==='caster')renderCaster(); });
+
+  // ---- CASTER FICHES ----
+  const cfData = await window._fbGet('casterFiches');
+  if (cfData) casterFiches = cfData;
+  window._fbListen('casterFiches', d=>{ casterFiches=d; if(currentTab==='caster')renderCaster(); });
+
+  // ---- AGENDA ----
+  const agData = await window._fbGet('agenda');
+  if (agData) { agEvents=agData.events||{}; agAbsences=agData.absences||[]; }
+  window._fbListen('agenda', d=>{ agEvents=d.events||{};agAbsences=d.absences||[]; if(currentTab==='agenda')agRender(); });
+
+  // ---- HISTORY ----
+  const hData = await window._fbGet('history');
+  if (hData) hEvents = hData;
+  window._fbListen('history', d=>{ hEvents=d; if(currentTab==='history'){histRenderStats();histRenderList();} });
+
+  // ---- ROSTER ----
+  const rData = await window._fbGet('roster');
+  if (rData) rosterData = rData;
+  window._fbListen('roster', d=>{ rosterData=d; if(currentTab==='roster')renderRoster(); });
+
+  hideSyncBanner();
+  renderSidebar();renderApp();agRender();histRenderStats();histRenderList();renderRoster();renderStaff();renderCaster();
+}
+
+// Override save functions to write to Firebase
+const _origPSave = pSave;
+function pSave(){
+  clearTimeout(saveTimer);saveTimer=setTimeout(()=>{const el=document.getElementById('saveIndicator');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800);},400);
+  if(window._fbSet) window._fbSet('planning',{tournaments,activeTournamentId});
+}
+function staffSave(){ localStorage.setItem('clx-staff',JSON.stringify(staffList)); if(window._fbSet) window._fbSet('staff',staffList); }
+function teamsSave(){ localStorage.setItem('clx-caster-teams',JSON.stringify(casterTeams)); if(window._fbSet) window._fbSet('casterTeams',casterTeams); }
+function ficheSave(){ localStorage.setItem('clx-caster-fiches',JSON.stringify(casterFiches)); if(window._fbSet) window._fbSet('casterFiches',casterFiches); }
+function agSave(){ localStorage.setItem('clx-agenda',JSON.stringify(agEvents));localStorage.setItem('clx-absences',JSON.stringify(agAbsences)); if(window._fbSet) window._fbSet('agenda',{events:agEvents,absences:agAbsences}); }
+function hSave(){ localStorage.setItem('clx-history',JSON.stringify(hEvents)); if(window._fbSet) window._fbSet('history',hEvents); }
+function saveRoster(){ rosterData.name=document.getElementById('rosterNameBig').value; localStorage.setItem('clx-roster-v2',JSON.stringify(rosterData)); if(window._fbSet) window._fbSet('roster',rosterData); }
+
+// Sync banner
+function showSyncBanner(msg){ let b=document.getElementById('syncBanner');if(!b){b=document.createElement('div');b.id='syncBanner';b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(253,86,239,.15);backdrop-filter:blur(8px);border-bottom:1px solid rgba(253,86,239,.3);padding:10px;text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:2px;color:#fd56ef;';document.body.appendChild(b);}b.textContent=msg;b.style.display='block';}
+function hideSyncBanner(){ const b=document.getElementById('syncBanner');if(b)b.style.display='none'; }
+
+// Wait for Firebase then init
+window.addEventListener('firebase-ready', initApp);
+// Fallback if Firebase fails after 4s
+setTimeout(()=>{ if(!document.getElementById('syncBanner')||document.getElementById('syncBanner').style.display==='none')return; hideSyncBanner(); renderSidebar();renderApp();agRender();histRenderStats();histRenderList();renderRoster();renderStaff();renderCaster(); }, 4000);
 </script>
 </body>
 </html>
