@@ -29,7 +29,12 @@
     return db.collection('clxhub').doc(docId).onSnapshot(snap => { if(snap.exists) cb(JSON.parse(snap.data().data)); });
   };
   window._fbReady = true;
-  window.dispatchEvent(new Event('firebase-ready'));
+  // Déclenche l'init une fois que tout le DOM et les scripts sont chargés
+  if (document.readyState === 'complete') {
+    window.dispatchEvent(new Event('firebase-ready'));
+  } else {
+    window.addEventListener('load', () => window.dispatchEvent(new Event('firebase-ready')));
+  }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -1080,46 +1085,55 @@ function renderRoster(){
 
 /* ===== INIT FIREBASE ===== */
 async function initApp() {
+  console.log('🔥 Firebase initApp démarré');
   showSyncBanner('Connexion à Firebase...');
 
   // ---- PLANNING ----
   const pData = await window._fbGet('planning');
+  console.log('📦 planning depuis Firebase:', pData);
   if (pData) { tournaments = pData.tournaments||{}; activeTournamentId = pData.activeTournamentId||null; }
   if (Object.keys(tournaments).length===0){ const t=makeDefT('Mon Premier Tournoi');tournaments[t.id]=t;activeTournamentId=t.id; }
   if (!tournaments[activeTournamentId]) activeTournamentId = Object.keys(tournaments)[0]||null;
-  window._fbListen('planning', d=>{ tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;renderSidebar();renderApp(); });
+  window._fbListen('planning', d=>{ console.log('🔄 planning update reçu');tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;renderSidebar();renderApp(); });
 
   // ---- STAFF ----
   const sData = await window._fbGet('staff');
+  console.log('📦 staff depuis Firebase:', sData);
   if (sData) staffList = sData;
   window._fbListen('staff', d=>{ staffList=d; if(currentTab==='staff')renderStaff(); });
 
   // ---- CASTER TEAMS ----
   const ctData = await window._fbGet('casterTeams');
+  console.log('📦 casterTeams depuis Firebase:', ctData);
   if (ctData) casterTeams = ctData;
   window._fbListen('casterTeams', d=>{ casterTeams=d; if(currentTab==='caster')renderCaster(); });
 
   // ---- CASTER FICHES ----
   const cfData = await window._fbGet('casterFiches');
+  console.log('📦 casterFiches depuis Firebase:', cfData);
   if (cfData) casterFiches = cfData;
   window._fbListen('casterFiches', d=>{ casterFiches=d; if(currentTab==='caster')renderCaster(); });
 
   // ---- AGENDA ----
   const agData = await window._fbGet('agenda');
+  console.log('📦 agenda depuis Firebase:', agData);
   if (agData) { agEvents=agData.events||{}; agAbsences=agData.absences||[]; }
   window._fbListen('agenda', d=>{ agEvents=d.events||{};agAbsences=d.absences||[]; if(currentTab==='agenda')agRender(); });
 
   // ---- HISTORY ----
   const hData = await window._fbGet('history');
+  console.log('📦 history depuis Firebase:', hData);
   if (hData) hEvents = hData;
   window._fbListen('history', d=>{ hEvents=d; if(currentTab==='history'){histRenderStats();histRenderList();} });
 
   // ---- ROSTER ----
   const rData = await window._fbGet('roster');
+  console.log('📦 roster depuis Firebase:', rData);
   if (rData) rosterData = rData;
   window._fbListen('roster', d=>{ rosterData=d; if(currentTab==='roster')renderRoster(); });
 
   hideSyncBanner();
+  console.log('✅ Firebase init terminé, rendu de l\'app...');
   renderSidebar();renderApp();agRender();histRenderStats();histRenderList();renderRoster();renderStaff();renderCaster();
 }
 
@@ -1127,7 +1141,7 @@ async function initApp() {
 const _origPSave = pSave;
 function pSave(){
   clearTimeout(saveTimer);saveTimer=setTimeout(()=>{const el=document.getElementById('saveIndicator');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1800);},400);
-  if(window._fbSet) window._fbSet('planning',{tournaments,activeTournamentId});
+  if(window._fbSet){ console.log('💾 Sauvegarde planning vers Firebase...'); window._fbSet('planning',{tournaments,activeTournamentId}); }
 }
 function staffSave(){ localStorage.setItem('clx-staff',JSON.stringify(staffList)); if(window._fbSet) window._fbSet('staff',staffList); }
 function teamsSave(){ localStorage.setItem('clx-caster-teams',JSON.stringify(casterTeams)); if(window._fbSet) window._fbSet('casterTeams',casterTeams); }
