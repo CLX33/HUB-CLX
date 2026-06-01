@@ -1291,16 +1291,6 @@ async function initApp() {
   if (pData) { tournaments = pData.tournaments||{}; activeTournamentId = pData.activeTournamentId||null; }
   if (Object.keys(tournaments).length===0){ const t=makeDefT('Mon Premier Tournoi');tournaments[t.id]=t;activeTournamentId=t.id; }
   if (!tournaments[activeTournamentId]) activeTournamentId = Object.keys(tournaments)[0]||null;
-
-  // 🔄 FORCE le nouveau template sur le tournoi actif
-  const freshTemplate = makeDefT('_template_');
-  const activeT = tournaments[activeTournamentId];
-  if (activeT) {
-    activeT.days = freshTemplate.days;
-    console.log('✅ Nouveau template appliqué au tournoi existant');
-    await window._fbSet('planning', {tournaments, activeTournamentId});
-  }
-
   window._fbListen('planning', d=>{ console.log('🔄 planning update reçu');tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;renderSidebar();renderApp(); });
 
   // ---- STAFF ----
