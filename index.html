@@ -59,7 +59,7 @@
   --light:#60d8fa;--medium:#3ecf8e;--heavy:#f5a623;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0d0d12 url('https://CLX33.github.io/planification-tournoi/ss_ec3dd1c52751d8908ffb140a33dc448e39da26d0.1920x1080.jpg') center/cover no-repeat fixed;color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+body{background:#0d0d12 url('https://CLX33.github.io/planification-tournoi/ss_ec3dd1c52751d8908ffb140a33dc448e39da26d0_1920x1080.jpg') center/cover no-repeat fixed;color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:rgba(8,8,15,0.65);pointer-events:none;z-index:0;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
@@ -461,8 +461,7 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sidebar-header">
-    <div class="sidebar-logo">⚡ CLX</div>
-    <div class="sidebar-title">CLX <span>HUB</span></div>
+    <div style="font-family:var(--mono);font-size:18px;font-weight:700;color:var(--accent);letter-spacing:3px;text-transform:uppercase;padding:2px 0;">CLX HUB</div>
   </div>
   <div class="sidebar-tabs">
     <div class="sidebar-cat-label">🏆 CLX TOURNAMENT</div>
@@ -1291,43 +1290,46 @@ async function initApp() {
   if (pData) { tournaments = pData.tournaments||{}; activeTournamentId = pData.activeTournamentId||null; }
   if (Object.keys(tournaments).length===0){ const t=makeDefT('Mon Premier Tournoi');tournaments[t.id]=t;activeTournamentId=t.id; }
   if (!tournaments[activeTournamentId]) activeTournamentId = Object.keys(tournaments)[0]||null;
-  window._fbListen('planning', d=>{ console.log('🔄 planning update reçu');tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;renderSidebar();renderApp(); });
+  window._fbListen('planning', d=>{
+    if(document.activeElement&&document.activeElement.tagName==='INPUT'||document.activeElement&&document.activeElement.tagName==='TEXTAREA') return;
+    console.log('🔄 planning update reçu');tournaments=d.tournaments||{};activeTournamentId=d.activeTournamentId||null;renderSidebar();renderApp();
+  });
 
   // ---- STAFF ----
   const sData = await window._fbGet('staff');
   console.log('📦 staff depuis Firebase:', sData);
   if (sData) staffList = sData;
-  window._fbListen('staff', d=>{ staffList=d; if(currentTab==='staff')renderStaff(); });
+  window._fbListen('staff', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; staffList=d; if(currentTab==='staff')renderStaff(); });
 
   // ---- CASTER TEAMS ----
   const ctData = await window._fbGet('casterTeams');
   console.log('📦 casterTeams depuis Firebase:', ctData);
   if (ctData) casterTeams = ctData;
-  window._fbListen('casterTeams', d=>{ casterTeams=d; if(currentTab==='caster')renderCaster(); });
+  window._fbListen('casterTeams', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; casterTeams=d; if(currentTab==='caster')renderCaster(); });
 
   // ---- CASTER FICHES ----
   const cfData = await window._fbGet('casterFiches');
   console.log('📦 casterFiches depuis Firebase:', cfData);
   if (cfData) casterFiches = cfData;
-  window._fbListen('casterFiches', d=>{ casterFiches=d; if(currentTab==='caster')renderCaster(); });
+  window._fbListen('casterFiches', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; casterFiches=d; if(currentTab==='caster')renderCaster(); });
 
   // ---- AGENDA ----
   const agData = await window._fbGet('agenda');
   console.log('📦 agenda depuis Firebase:', agData);
   if (agData) { agEvents=agData.events||{}; agAbsences=agData.absences||[]; }
-  window._fbListen('agenda', d=>{ agEvents=d.events||{};agAbsences=d.absences||[]; if(currentTab==='agenda')agRender(); });
+  window._fbListen('agenda', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; agEvents=d.events||{};agAbsences=d.absences||[]; if(currentTab==='agenda')agRender(); });
 
   // ---- HISTORY ----
   const hData = await window._fbGet('history');
   console.log('📦 history depuis Firebase:', hData);
   if (hData) hEvents = hData;
-  window._fbListen('history', d=>{ hEvents=d; if(currentTab==='history'){histRenderStats();histRenderList();} });
+  window._fbListen('history', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; hEvents=d; if(currentTab==='history'){histRenderStats();histRenderList();} });
 
   // ---- ROSTER ----
   const rData = await window._fbGet('roster');
   console.log('📦 roster depuis Firebase:', rData);
   if (rData) rosterData = rData;
-  window._fbListen('roster', d=>{ rosterData=d; if(currentTab==='roster')renderRoster(); });
+  window._fbListen('roster', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; rosterData=d; if(currentTab==='roster')renderRoster(); });
 
   hideSyncBanner();
   console.log('✅ Firebase init terminé, rendu de l\'app...');
