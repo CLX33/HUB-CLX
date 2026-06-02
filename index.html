@@ -59,7 +59,7 @@
   --light:#60d8fa;--medium:#3ecf8e;--heavy:#f5a623;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0d0d12 url('https://CLX33.github.io/HUB-CLX/ss_ec3dd1c52751d8908ffb140a33dc448e39da26d0_1920x1080.jpg') center/cover no-repeat fixed;color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+body{background:#0d0d12 url('https://raw.githubusercontent.com/CLX33/HUB-CLX/main/ss_ec3dd1c52751d8908ffb140a33dc448e39da26d0.1920x1080.jpg') center/cover no-repeat fixed;color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:rgba(8,8,15,0.65);pointer-events:none;z-index:0;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
@@ -255,7 +255,7 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .team-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
 .team-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
 .team-card:hover{border-color:rgba(253,86,239,.35);box-shadow:0 0 20px rgba(253,86,239,.05);}
-.team-card-band{height:3px;background:linear-gradient(90deg,var(--accent),var(--cyan));flex-shrink:0;}
+.team-card-band{height:18px;background:linear-gradient(90deg,var(--accent),var(--cyan));flex-shrink:0;display:flex;align-items:center;}
 .team-card-head{padding:10px 12px 8px;border-bottom:1px solid var(--border);position:relative;}
 .team-flag-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
 .team-flag-select{background:transparent;border:.5px solid var(--border);border-radius:3px;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 4px;outline:none;cursor:pointer;max-width:90px;}
@@ -814,7 +814,7 @@ function renderApp(){
   const app=document.getElementById('app');const t=getT();
   if(!t){app.innerHTML='<div class="empty-state"><h2>Aucun tournoi</h2><p>Crée un nouveau tournoi.</p><button class="btn btn-primary" onclick="openNewModal()">+ Créer</button></div>';return;}
   migrateT(t);calcTimes(t);app.innerHTML='';
-  const hdr=document.createElement('header');hdr.innerHTML=`<div class="title-badge">⚡ CLX TOURNAMENT</div><br><input class="t-name-input" value="${esc(t.name)}" placeholder="Nom du tournoi..." maxlength="50" oninput="renameTournament(this.value)">`;app.appendChild(hdr);
+  const hdr=document.createElement('header');hdr.innerHTML=`<input class="t-name-input" value="${esc(t.name)}" placeholder="Nom du tournoi..." maxlength="50" oninput="renameTournament(this.value)">`;app.appendChild(hdr);
   const tb=document.createElement('div');tb.className='toolbar';tb.innerHTML=`<label>Durée match (min)</label><input type="number" value="${t.defaultDur||10}" min="1" max="120" oninput="updateSetting('defaultDur',this.value)"><div class="sep"></div><button class="btn btn-secondary" onclick="doExport()">📋 Exporter</button><button class="btn btn-gold btn-sm" onclick="doCopy()">Copier</button>`;app.appendChild(tb);
   const planner=document.createElement('div');planner.id='planner';app.appendChild(planner);
   const addDayBtn=document.createElement('button');addDayBtn.className='btn btn-secondary';addDayBtn.style.marginTop='1.5rem';addDayBtn.textContent='+ Ajouter un jour';addDayBtn.onclick=addDay;app.appendChild(addDayBtn);
@@ -938,10 +938,35 @@ let casterFiches=JSON.parse(localStorage.getItem('clx-caster-fiches')||'[]');
 function teamsSave_local(){localStorage.setItem('clx-caster-teams',JSON.stringify(casterTeams));}
 function ficheSave_local(){localStorage.setItem('clx-caster-fiches',JSON.stringify(casterFiches));}
 function makeTeam(){return{id:uid(),name:'',flag:'',funfact:'',players:[{id:uid(),pseudo:'',cls:''},{id:uid(),pseudo:'',cls:''},{id:uid(),pseudo:'',cls:''}],eliminated:false};}
-function addTeam(){casterTeams.push(makeTeam());teamsSave();renderCaster();}
-function deleteTeam(id){if(!confirm('Supprimer cette équipe ?'))return;casterTeams=casterTeams.filter(t=>t.id!==id);teamsSave();renderCaster();}
-function toggleEliminate(id){const t=casterTeams.find(t=>t.id===id);if(t){t.eliminated=!t.eliminated;teamsSave();renderCaster();}}
-function updateTeam(id,key,val){const t=casterTeams.find(t=>t.id===id);if(t){t[key]=val;teamsSave();if(key==='flag')renderCaster();}}
+function addTeam(){
+  const newTeam=makeTeam();
+  newTeam.order=casterTeams.length;
+  casterTeams.push(newTeam);
+  teamsSave();
+  renderCaster();
+}
+function deleteTeam(id){
+  if(!confirm('Supprimer cette équipe ?'))return;
+  casterTeams=casterTeams.filter(t=>t.id!==id);
+  // Recalculate order
+  casterTeams.forEach((t,i)=>t.order=i);
+  teamsSave();
+  renderCaster();
+}
+function toggleEliminate(id){
+  const t=casterTeams.find(t=>t.id===id);
+  if(t){
+    t.eliminated=!t.eliminated;
+    // Sauvegarde sans changer l'ordre
+    teamsSave();
+    // Re-render local seulement, sans attendre Firebase
+    renderCaster();
+  }
+}
+function toggleLock(id){
+  const t=casterTeams.find(t=>t.id===id);
+  if(t){t.locked=!t.locked;teamsSave();renderCaster();}
+}function updateTeam(id,key,val){const t=casterTeams.find(t=>t.id===id);if(t){t[key]=val;teamsSave();if(key==='flag')renderCaster();}}
 function updateTeamPlayer(tid,pid,key,val){const t=casterTeams.find(t=>t.id===tid);if(!t)return;const p=t.players.find(p=>p.id===pid);if(p){p[key]=val;teamsSave();}}
 
 // Debounce helper — évite le re-render à chaque frappe
@@ -964,45 +989,56 @@ function updateFiche(id,key,val){const f=casterFiches.find(f=>f.id===id);if(f){f
 
 function toggleLock(id){const t=casterTeams.find(t=>t.id===id);if(t){t.locked=!t.locked;teamsSave();renderCaster();}}
 
-function buildTeamCard(team){
-  const flagObj=FLAGS.find(f=>f.code===team.flag)||FLAGS[0];
+function buildTeamCard(team,num){
   const elim=team.eliminated||false;
   const locked=team.locked||false;
+  const teamId=team.id;
   const card=document.createElement('div');
   card.className='team-card'+(elim?' eliminated':'')+(locked?' locked':'');
 
   const flagDropdownEl=document.createElement('div');
   flagDropdownEl.className='flag-dropdown';
-  flagDropdownEl.id=`fpd-${team.id}`;
+  flagDropdownEl.id=`fpd-${teamId}`;
   flagDropdownEl.style.display='none';
-  flagDropdownEl.innerHTML=FLAGS.map(f=>`<span class="flag-opt" onclick="selectFlag('${team.id}','${f.code}')" title="${f.label}"><img src="https://flagcdn.com/w40/${f.img}.png" alt="${f.label}"></span>`).join('');
+  FLAGS.forEach(f=>{
+    const span=document.createElement('span');
+    span.className='flag-opt';
+    span.title=f.label;
+    span.innerHTML=`<img src="https://flagcdn.com/w40/${f.img}.png" alt="${f.label}">`;
+    span.addEventListener('click',()=>selectFlag(teamId,f.code));
+    flagDropdownEl.appendChild(span);
+  });
   document.body.appendChild(flagDropdownEl);
 
-  const flagPicker=`
-    <div class="flag-picker-wrap" id="fp-${team.id}" style="display:flex;align-items:center;gap:6px;">
-      <button class="flag-current" onclick="${locked?'':'toggleFlagPicker(\''+team.id+'\')'}" title="${locked?'Déverrouille pour modifier':'Changer la nationalité'}" style="${locked?'cursor:not-allowed;opacity:.6':''}">${flagImg(team.flag,24)}</button>
-      <button onclick="toggleLock('${team.id}')" title="${locked?'Déverrouiller':'Verrouiller'}" style="background:${locked?'rgba(240,165,0,.2)':'rgba(255,255,255,.05)'};border:1px solid ${locked?'var(--gold)':'var(--border)'};color:${locked?'var(--gold)':'var(--text2)'};cursor:pointer;border-radius:5px;padding:4px 7px;font-size:13px;transition:all .15s;">${locked?'🔒':'🔓'}</button>
-    </div>`;
-
   card.innerHTML=`
-    <div class="team-card-band" style="${elim?'background:linear-gradient(90deg,#e53e3e,#c53030)':locked?'background:linear-gradient(90deg,var(--gold),#b07800)':''}"></div>
+    <div class="team-card-band" style="${elim?'background:linear-gradient(90deg,#e53e3e,#c53030)':locked?'background:linear-gradient(90deg,var(--gold),#b07800)':''}">
+      ${num?`<span style="font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.7);padding:0 8px;line-height:1;">#${num}</span>`:''}
+    </div>
     <div class="team-card-head">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        ${flagPicker}
-        <div style="display:flex;gap:12px;align-items:center;">
-          <button class="team-del-btn" onclick="${locked?'alert(\'Déverrouille la case d\'abord !\')':'deleteTeam(\''+team.id+'\')'}" style="${locked?'opacity:.4;cursor:not-allowed':''}">✕</button>
+        <div class="flag-picker-wrap" id="fp-${teamId}" style="display:flex;align-items:center;gap:6px;">
+          <button class="flag-current js-flag" style="${locked?'cursor:not-allowed;opacity:.6':''}">${flagImg(team.flag,24)}</button>
+          <button class="js-lock" style="background:${locked?'rgba(240,165,0,.2)':'rgba(255,255,255,.05)'};border:1px solid ${locked?'var(--gold)':'var(--border)'};color:${locked?'var(--gold)':'var(--text2)'};cursor:pointer;border-radius:5px;padding:4px 7px;font-size:13px;transition:all .15s;">${locked?'🔒':'🔓'}</button>
         </div>
+        <button class="team-del-btn js-del" style="${locked?'opacity:.4;cursor:not-allowed':''}">✕</button>
       </div>
-      <input class="team-name-input" style="${elim?'color:#e53e3e;text-decoration:line-through;':''}" value="${esc(team.name)}" placeholder="NOM DE L'ÉQUIPE..." ${locked?'readonly':'oninput="dUpdateTeam(\''+team.id+'\',\'name\',this.value)"'} style="${locked?'cursor:not-allowed;opacity:.7':''}">
+      <input class="team-name-input" style="${elim?'color:#e53e3e;text-decoration:line-through;':''}" value="${esc(team.name)}" placeholder="NOM DE L'ÉQUIPE..." ${locked?'readonly':'oninput="dUpdateTeam(\''+teamId+'\',\'name\',this.value)"'}>
     </div>
     <div class="team-players">
       ${team.players.map((p,i)=>`
         <div class="team-player-row" style="${elim?'opacity:.5':''}">
           <span class="team-player-num">#${i+1}</span>
-          <input class="team-player-pseudo" value="${esc(p.pseudo)}" placeholder="JOUEUR ${i+1}..." ${locked?'readonly style="cursor:not-allowed;opacity:.7"':'oninput="dUpdatePlayer(\''+team.id+'\',\''+p.id+'\',\'pseudo\',this.value)"'}>
+          <input class="team-player-pseudo" value="${esc(p.pseudo)}" placeholder="JOUEUR ${i+1}..." ${locked?'readonly style="cursor:not-allowed;opacity:.7"':'oninput="dUpdatePlayer(\''+teamId+'\',\''+p.id+'\',\'pseudo\',this.value)"'}>
         </div>`).join('')}
-      <button onclick="toggleEliminate('${team.id}')" ${locked?'disabled style="opacity:.4;cursor:not-allowed"':''} style="margin-top:8px;width:100%;background:${elim?'rgba(229,62,62,.2)':'rgba(255,255,255,.04)'};border:1px solid ${elim?'#e53e3e':'var(--border)'};color:${elim?'#e53e3e':'var(--text2)'};cursor:pointer;border-radius:5px;padding:6px;font-family:var(--mono);font-size:9px;letter-spacing:1px;transition:all .15s;">${elim?'☠️ ÉLIMINÉE — Réintégrer':'⚔️ ÉLIMINER'}</button>
+      <button class="js-elim" ${locked?'disabled':''} style="margin-top:8px;width:100%;background:${elim?'rgba(229,62,62,.2)':'rgba(255,255,255,.04)'};border:1px solid ${elim?'#e53e3e':'var(--border)'};color:${elim?'#e53e3e':'var(--text2)'};cursor:${locked?'not-allowed':'pointer'};opacity:${locked?.4:1};border-radius:5px;padding:6px;font-family:var(--mono);font-size:9px;letter-spacing:1px;transition:all .15s;">${elim?'☠️ ÉLIMINÉE — Réintégrer':'⚔️ ÉLIMINER'}</button>
     </div>`;
+
+  // Attach all events via addEventListener — zero inline onclick
+  card.querySelector('.js-flag').addEventListener('click',()=>{ if(!locked) toggleFlagPicker(teamId); });
+  card.querySelector('.js-lock').addEventListener('click',()=>toggleLock(teamId));
+  card.querySelector('.js-del').addEventListener('click',()=>{ if(locked){alert('Déverrouille la case d\'abord !');return;} deleteTeam(teamId); });
+  card.querySelector('.js-elim').addEventListener('click',()=>{ if(!locked) toggleEliminate(teamId); });
+
   return card;
 }
 
@@ -1046,17 +1082,19 @@ document.addEventListener('click',e=>{
 });
 
 function renderCaster(){
-  // Clean up old body-level flag dropdowns
   document.querySelectorAll('.flag-dropdown').forEach(d=>d.remove());
   const grid=document.getElementById('teamGrid');grid.innerHTML='';
-  const active=casterTeams.filter(t=>!t.eliminated);
-  const elim=casterTeams.filter(t=>t.eliminated);
+
+  // Toujours trier par order pour garder le bon ordre
+  const sorted=[...casterTeams].sort((a,b)=>(a.order??0)-(b.order??0));
+  const active=sorted.filter(t=>!t.eliminated);
+  const elim=sorted.filter(t=>t.eliminated);
 
   if(!casterTeams.length){
     grid.innerHTML=`<div class="empty-state" style="grid-column:1/-1"><h2>Aucune équipe</h2><p>Ajoute les équipes participantes.</p></div>`;
   } else {
     // Équipes actives
-    active.forEach(team=>grid.appendChild(buildTeamCard(team)));
+    active.forEach((team,i)=>grid.appendChild(buildTeamCard(team,i+1)));
 
     // Séparateur éliminées
     if(elim.length){
@@ -1064,7 +1102,7 @@ function renderCaster(){
       sep.style.cssText='grid-column:1/-1;margin:16px 0 8px;display:flex;align-items:center;gap:12px;';
       sep.innerHTML=`<div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(229,62,62,.5),transparent)"></div><span style="font-family:var(--mono);font-size:9px;letter-spacing:3px;color:#e53e3e;text-transform:uppercase;white-space:nowrap;">☠️ Équipes éliminées</span><div style="flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(229,62,62,.5))"></div>`;
       grid.appendChild(sep);
-      elim.forEach(team=>grid.appendChild(buildTeamCard(team)));
+      elim.forEach((team,i)=>grid.appendChild(buildTeamCard(team,active.length+i+1)));
     }
   }
 
@@ -1305,7 +1343,17 @@ async function initApp() {
   const ctData = await window._fbGet('casterTeams');
   console.log('📦 casterTeams depuis Firebase:', ctData);
   if (ctData) casterTeams = ctData;
-  window._fbListen('casterTeams', d=>{ if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return; casterTeams=d; if(currentTab==='caster')renderCaster(); });
+  window._fbListen('casterTeams', d=>{
+    if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return;
+    // Mettre à jour chaque équipe par ID sans changer l'ordre local
+    d.forEach(fbTeam=>{
+      const local=casterTeams.find(t=>t.id===fbTeam.id);
+      if(local){Object.assign(local,fbTeam);}
+      else{casterTeams.push(fbTeam);}
+    });
+    casterTeams=casterTeams.filter(t=>d.find(f=>f.id===t.id));
+    if(currentTab==='caster')renderCaster();
+  });
 
   // ---- CASTER FICHES ----
   const cfData = await window._fbGet('casterFiches');
