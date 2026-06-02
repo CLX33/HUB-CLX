@@ -451,7 +451,13 @@ header::after{content:'';display:block;height:2px;background:linear-gradient(90d
 .hm-save{background:var(--accent);color:#fff;}
 .hm-save:hover{filter:brightness(1.1);}
 
-@media(max-width:900px){.roster-players-grid{grid-template-columns:1fr;}}
+@media print{
+  body > *:not(#pdf-overlay){display:none!important;}
+  body{background:#fff!important;}
+  #pdf-overlay{position:static!important;overflow:visible!important;padding:20px 40px!important;background:#fff!important;}
+  #pdf-overlay button{display:none!important;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+}
 @media(max-width:700px){.sidebar{width:180px;}.main{margin-left:180px;}.ag-grid{grid-template-columns:repeat(4,1fr);}.hist-stats{grid-template-columns:repeat(3,1fr);}.entry{grid-template-columns:90px 1fr 60px 32px;}.entry-type{display:none;}}
 @media(max-width:480px){.ag-grid{grid-template-columns:repeat(2,1fr);}}
 </style>
@@ -815,7 +821,7 @@ function renderApp(){
   if(!t){app.innerHTML='<div class="empty-state"><h2>Aucun tournoi</h2><p>Crée un nouveau tournoi.</p><button class="btn btn-primary" onclick="openNewModal()">+ Créer</button></div>';return;}
   migrateT(t);calcTimes(t);app.innerHTML='';
   const hdr=document.createElement('header');hdr.innerHTML=`<input class="t-name-input" value="${esc(t.name)}" placeholder="Nom du tournoi..." maxlength="50" oninput="renameTournament(this.value)">`;app.appendChild(hdr);
-  const tb=document.createElement('div');tb.className='toolbar';tb.innerHTML=`<label>Durée match (min)</label><input type="number" value="${t.defaultDur||10}" min="1" max="120" oninput="updateSetting('defaultDur',this.value)"><div class="sep"></div><button class="btn btn-secondary" onclick="doExport()">📋 Exporter</button><button class="btn btn-gold btn-sm" onclick="doCopy()">Copier</button>`;app.appendChild(tb);
+  const tb=document.createElement('div');tb.className='toolbar';tb.innerHTML=`<label>Durée match (min)</label><input type="number" value="${t.defaultDur||10}" min="1" max="120" oninput="updateSetting('defaultDur',this.value)"><label style="margin-left:10px">Date tournoi</label><input type="date" id="tournoi-date" value="${t.date||''}" oninput="updateSetting('date',this.value)" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:5px 8px;border-radius:3px;outline:none;cursor:pointer;"><div class="sep"></div><button class="btn btn-secondary" onclick="doExport()">📋 Exporter</button><button class="btn btn-gold btn-sm" onclick="doCopy()">Copier</button><button class="btn btn-sm" onclick="exportPDF()" style="background:#7c3aed;color:#fff;border:none;border-radius:3px;padding:7px 14px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;text-transform:uppercase;">📄 PDF</button>`;app.appendChild(tb);
   const planner=document.createElement('div');planner.id='planner';app.appendChild(planner);
   const addDayBtn=document.createElement('button');addDayBtn.className='btn btn-secondary';addDayBtn.style.marginTop='1.5rem';addDayBtn.textContent='+ Ajouter un jour';addDayBtn.onclick=addDay;app.appendChild(addDayBtn);
   const expBox=document.createElement('div');expBox.className='export-box';expBox.id='exportBox';expBox.style.display='none';expBox.innerHTML=`<h3>Export</h3><textarea class="export-text" id="exportTA" readonly></textarea>`;app.appendChild(expBox);
@@ -856,6 +862,62 @@ function deleteEntry(dId,bId,eId){const t=getT();if(!t)return;const bl=getBlocsF
 function buildExport(){const t=getT();if(!t)return'';migrateT(t);calcTimes(t);let out=`🕒 PLANNING — ${t.name}\n${'═'.repeat(40)}\n\n`;for(const day of t.days){out+=`📅 ${day.name} (début ${day.start})\n${'─'.repeat(30)}\n`;for(const bloc of day.blocs){out+=`\n${DOT_MAP[bloc.color]||'⚫'} ${bloc.title}\n`;for(const e of bloc.entries)out+=`${e.type==='pause'?'☕ ':'   '}${minToTime(e._start)} - ${minToTime(e._end)} | ${e.label} (${e.dur} min)\n`;}out+='\n';}return out;}
 function doExport(){const box=document.getElementById('exportBox'),ta=document.getElementById('exportTA');if(!box||!ta)return;ta.value=buildExport();box.style.display='block';box.scrollIntoView({behavior:'smooth'});}
 function doCopy(){const text=buildExport();navigator.clipboard.writeText(text).catch(()=>{});const btn=event.target;btn.textContent='✓ Copié !';setTimeout(()=>btn.textContent='Copier',1500);doExport();}
+
+function exportPDF(){
+  const t=getT();if(!t)return;
+  migrateT(t);calcTimes(t);
+  const TYPE_COLORS={match:'#fd56ef',pause:'#8888a8',battement:'#cccccc',finale:'#f0a500',loser:'#e67e22',placement:'#0eb8c4'};
+  const dateInput=document.getElementById('tournoi-date');
+  let customDate='';
+  if(dateInput&&dateInput.value){try{const d=new Date(dateInput.value+'T12:00:00');customDate=d.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});}catch(e){}}
+
+  const existing=document.getElementById('pdf-overlay');if(existing)existing.remove();
+  const overlay=document.createElement('div');
+  overlay.id='pdf-overlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:9999;background:#fff;overflow-y:auto;padding:50px 60px;color:#111;font-family:Arial,sans-serif;';
+
+  let c=`<div style="max-width:680px;margin:0 auto;">
+    <div style="text-align:center;margin-bottom:36px;padding-bottom:20px;border-bottom:3px solid #fd56ef;">
+      <div style="font-size:28px;font-weight:900;letter-spacing:4px;text-transform:uppercase;color:#111;margin-bottom:6px;">${t.name}</div>
+      ${customDate?`<div style="font-size:13px;letter-spacing:2px;color:#fd56ef;text-transform:uppercase;">${customDate}</div>`:''}
+    </div>`;
+
+  for(let di=0;di<t.days.length;di++){
+    const day=t.days[di];
+    const isLast=di===t.days.length-1;
+    c+=`<div style="margin-bottom:32px;${isLast?'':'page-break-after:always;break-after:page;'}">
+      <div style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fd56ef;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid #eee;">${day.name} — Début ${day.start}</div>
+      <table style="width:100%;border-collapse:collapse;">`;
+    for(const e of bloc_entries_flat(day)){
+      if(e.type==='battement') continue;
+      const tc=e.type==='pause'?'#999':'#111';
+      const fw=e.type==='pause'?'400':'700';
+      const italic=e.type==='pause'?'italic':'normal';
+      c+=`<tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:8px 0;font-size:13px;font-weight:700;color:#fd56ef;width:130px;white-space:nowrap;font-family:monospace;">${minToTime(e._start)} – ${minToTime(e._end)}</td>
+        <td style="padding:8px 12px;font-size:14px;font-weight:${fw};color:${tc};font-style:${italic};">${e.label}</td>
+      </tr>`;
+    }
+    c+=`</table></div>`;
+  }
+
+  c+=`<div style="margin-top:40px;text-align:center;font-size:10px;letter-spacing:2px;color:#bbb;border-top:1px solid #eee;padding-top:14px;text-transform:uppercase;">CLX HUB</div>
+  <div style="display:flex;gap:12px;justify-content:center;margin-top:28px;padding-bottom:40px;">
+    <button id="pdf-print-btn" style="background:#fd56ef;color:#fff;border:none;border-radius:6px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ Imprimer / Enregistrer PDF</button>
+    <button id="pdf-close-btn" style="background:#f0f0f0;color:#555;border:none;border-radius:6px;padding:12px 20px;font-size:14px;cursor:pointer;">✕ Fermer</button>
+  </div></div>`;
+
+  overlay.innerHTML=c;
+  document.body.appendChild(overlay);
+  document.getElementById('pdf-print-btn').addEventListener('click',()=>window.print());
+  document.getElementById('pdf-close-btn').addEventListener('click',()=>overlay.remove());
+}
+
+function bloc_entries_flat(day){
+  const entries=[];
+  for(const bloc of day.blocs) for(const e of bloc.entries) entries.push(e);
+  return entries;
+}
 
 /* ===== STAFF ===== */
 let staffList=JSON.parse(localStorage.getItem('clx-staff')||'[]');
@@ -1345,7 +1407,6 @@ async function initApp() {
   if (ctData) casterTeams = ctData;
   window._fbListen('casterTeams', d=>{
     if(document.activeElement&&(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='TEXTAREA'))return;
-    // Mettre à jour chaque équipe par ID sans changer l'ordre local
     d.forEach(fbTeam=>{
       const local=casterTeams.find(t=>t.id===fbTeam.id);
       if(local){Object.assign(local,fbTeam);}
